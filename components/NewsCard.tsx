@@ -107,20 +107,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
-  newBadge: {
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#f59e0b',
-  },
-  newBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#92400e',
-    letterSpacing: 0.5,
-  },
   description: {
     fontSize: 15,
     color: '#4b5563',

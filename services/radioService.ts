@@ -138,6 +138,23 @@ class RadioService {
       };
     }
   }
+
+  async getRadioStreams(): Promise<RadioUrl[]> {
+    try {
+      const activeUrls = await this.getActiveRadioUrls();
+      
+      // Filtra apenas streams de rádio (typeId 1 e 12)
+      const radioStreams = activeUrls.filter(url => 
+        url.typeId === 1 || url.typeId === 12
+      );
+
+      console.log(`${radioStreams.length} streams de rádio encontrados`);
+      return radioStreams;
+    } catch (error) {
+      console.error('Erro ao buscar streams de rádio:', error);
+      return [];
+    }
+  }
 }
 
 export default new RadioService();

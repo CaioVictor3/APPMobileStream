@@ -17,18 +17,20 @@ interface RadioPlayerProps {
   stationName?: string;
   stationDescription?: string;
   autoPlay?: boolean;
+  streamUrl?: string;
 }
 
 export default function RadioPlayer({ 
   stationName = "Radio Central 91.9", 
   stationDescription = RADIO_CONFIG.STATION_DESCRIPTION.replace("Radio Central 91.9 (", "").replace(")", ""),
-  autoPlay = false
+  autoPlay = false,
+  streamUrl
 }: RadioPlayerProps) {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  const [currentStreamUrl, setCurrentStreamUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Configurar modo de áudio para reprodução de streaming
@@ -60,9 +62,15 @@ export default function RadioPlayer({
       setIsLoading(true);
       setError(null);
 
-      // Buscar URL do stream
-      const url = await RadioService.getRadioCentralUrl();
-      setStreamUrl(url);
+      // Usar streamUrl passada como prop ou buscar da API
+      let url: string;
+      if (streamUrl) {
+        url = streamUrl;
+        setCurrentStreamUrl(streamUrl);
+      } else {
+        url = await RadioService.getRadioCentralUrl();
+        setCurrentStreamUrl(url);
+      }
 
       // Carregar o áudio
       const { sound: newSound } = await Audio.Sound.createAsync(
@@ -113,19 +121,24 @@ export default function RadioPlayer({
   };
 
   const stop = async () => {
+    // Sua verificação inicial está perfeita!
     if (sound) {
       try {
-        await sound.stopAsync();
+        // Chamar unloadAsync() é o suficiente.
+        // Ele já para a reprodução ANTES de descarregar o som da memória.
+        // Chamar stopAsync() antes é desnecessário e causa o erro.
         await sound.unloadAsync();
+  
+        // O resto do seu código para limpar o estado está correto.
         setSound(null);
         setIsPlaying(false);
-        setStreamUrl(null);
+        setCurrentStreamUrl(null);
       } catch (err) {
-        console.error('Erro ao parar áudio:', err);
+        // Boa prática: podemos ajustar a mensagem de erro para ser mais precisa.
+        console.error('Erro ao descarregar o áudio:', err);
       }
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.playerContainer}>

@@ -79,14 +79,10 @@ export default function HomeScreen() {
             <Ionicons name="musical-notes" size={28} color="white" />
             <ThemedText style={styles.headerTitle}>Notícias de Música</ThemedText>
           </View>
-          <TouchableOpacity style={styles.playerButton} onPress={goToRadio}>
-            <Ionicons name="radio" size={22} color="white" />
-            <ThemedText style={styles.playerButtonText}>Rádio</ThemedText>
-          </TouchableOpacity>
         </View>
         <View style={styles.headerBottom}>
           <ThemedText style={styles.headerSubtitle}>
-            Fique por dentro das últimas novidades do mundo musical
+            Fique por dentro das últimas novidades do mundo da música
           </ThemedText>
         </View>
       </ThemedView>
@@ -200,31 +196,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 14,
     fontWeight: '600',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'white',
-    marginHorizontal: 16,
-    marginTop: -10,
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  statText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
   },
   scrollView: {
     flex: 1,
