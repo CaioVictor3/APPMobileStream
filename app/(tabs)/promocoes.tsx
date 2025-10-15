@@ -18,12 +18,31 @@ export default function PromocoesScreen() {
   const [promotions, setPromotions] = useState<PromotionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
-  const loadPromotions = async () => {
+  const loadPromotions = async (reset: boolean = true) => {
     try {
-      // Usando stationId padrão 1, você pode ajustar conforme necessário
-      const data = await promoService.getPromotions(1);
+      if (reset) {
+        setLoading(true);
+        setPromotions([]);
+        setHasMoreData(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      // Usando paginação com LastId para infinite scroll
+      const lastId = reset ? undefined : promotions[promotions.length - 1]?.id;
+      const data = await promoService.getPromotionsWithLastId(lastId, 20);
       
+      if (data.length === 0) {
+        setHasMoreData(false);
+        if (reset) {
+          Alert.alert("Aviso", "Nenhuma promoção foi encontrada.");
+        }
+        return;
+      }
+
       // Ordena as promoções por data de criação (mais recentes primeiro)
       const sortedData = data.sort((a, b) => {
         if (!a.createdAt && !b.createdAt) return 0;
@@ -32,9 +51,15 @@ export default function PromocoesScreen() {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
       
-      setPromotions(sortedData);
-      if (sortedData.length === 0) {
-        Alert.alert("Aviso", "Nenhuma promoção foi encontrada.");
+      if (reset) {
+        setPromotions(sortedData);
+      } else {
+        setPromotions(prev => [...prev, ...sortedData]);
+      }
+
+      // Se retornou menos itens que o pageSize, não há mais dados
+      if (data.length < 20) {
+        setHasMoreData(false);
       }
     } catch (error) {
       console.error(error);
@@ -42,6 +67,7 @@ export default function PromocoesScreen() {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      setLoadingMore(false);
     }
   };
 
@@ -51,7 +77,13 @@ export default function PromocoesScreen() {
 
   const onRefresh = () => {
     setRefreshing(true);
-    loadPromotions();
+    loadPromotions(true);
+  };
+
+  const loadMorePromotions = () => {
+    if (!loadingMore && hasMoreData) {
+      loadPromotions(false);
+    }
   };
 
   const openExternal = (url?: string) => {
@@ -100,6 +132,8 @@ export default function PromocoesScreen() {
             tintColor="#6366f1"
           />
         }
+        onEndReached={loadMorePromotions}
+        onEndReachedThreshold={0.1}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -133,6 +167,14 @@ export default function PromocoesScreen() {
           <View style={styles.emptyContainer}>
             <ThemedText style={styles.emptyText}>Nenhuma promoção disponível</ThemedText>
           </View>
+        }
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={styles.loadingMoreContainer}>
+              <ActivityIndicator size="small" color="#6366f1" />
+              <ThemedText style={styles.loadingMoreText}>Carregando mais promoções...</ThemedText>
+            </View>
+          ) : null
         }
       />
     </ThemedView>
@@ -217,6 +259,17 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+    color: "#6b7280",
+  },
+  loadingMoreContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 16,
+  },
+  loadingMoreText: {
+    marginLeft: 8,
+    fontSize: 14,
     color: "#6b7280",
   },
 });

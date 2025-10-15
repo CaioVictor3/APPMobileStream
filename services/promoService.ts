@@ -26,14 +26,54 @@ interface RawPromotion {
 }
 
 export const promoService = {
-  async getPromotions(stationId: number): Promise<PromotionItem[]> {
+  async getPromotions(currentPage: number = 1, pageSize: number = 20): Promise<PromotionItem[]> {
     try {
       const response = await axios.get(API_URL, {
         headers: {
           accept: "application/json",
           "x-api-key": API_KEY,
         },
-        params: { stationId }, // passa stationId como query
+        params: { 
+          CurrentPage: currentPage,
+          PageSize: pageSize
+        },
+      });
+
+      const rawData: any = (response?.data as any)?.data || response?.data;
+      if (!rawData) return [];
+
+      // Normaliza para array mesmo que seja objeto único
+      const promoArray: RawPromotion[] = Array.isArray(rawData) ? rawData : [rawData];
+
+      return promoArray.map((promo) => ({
+        id: promo.id ?? 0,
+        title: promo.title ?? "Sem título",
+        description: promo.description ?? "",
+        imageUrl: promo.imageUrl ?? "",
+        externalUrl: promo.externalUrl ?? undefined,
+        isAd: promo.isAd ?? false,
+        createdAt: promo.createdAt ?? undefined,
+        validUntil: promo.validUntil ?? undefined,
+      }));
+    } catch (error: any) {
+      console.error("Erro ao carregar promoções:", error.response?.status, error.message || error);
+      return [];
+    }
+  },
+
+  async getPromotionsWithLastId(lastId?: number, pageSize: number = 20): Promise<PromotionItem[]> {
+    try {
+      const params: any = { PageSize: pageSize };
+      if (lastId) {
+        params.LastId = lastId;
+      }
+
+      const response = await axios.get(API_URL, {
+        headers: {
+          accept: "application/json",
+          "x-api-key": API_KEY,
+        },
+        params,
       });
 
       const rawData: any = (response?.data as any)?.data || response?.data;
