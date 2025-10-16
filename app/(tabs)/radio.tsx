@@ -5,13 +5,13 @@ import RadioService, { RadioUrl } from '@/services/radioService';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from 'react-native';
 
 export default function RadioScreen() {
@@ -26,15 +26,14 @@ export default function RadioScreen() {
       const radioStreams = await RadioService.getRadioStreams();
       setStreams(radioStreams);
       
-      // Seleciona o primeiro stream por padrão
+
       if (radioStreams.length > 0 && !selectedStream) {
         setSelectedStream(radioStreams[0]);
       }
       
-      console.log(`${radioStreams.length} streams carregados`);
+     
     } catch (error) {
-      console.error('Erro ao carregar streams:', error);
-      Alert.alert(
+      console.error('Erro ao carregar streams:', error);      Alert.alert(
         'Erro',
         'Não foi possível carregar as estações de rádio. Verifique sua conexão.',
         [{ text: 'OK' }]
@@ -52,7 +51,7 @@ export default function RadioScreen() {
 
   const handleStreamSelect = (stream: RadioUrl) => {
     setSelectedStream(stream);
-    console.log(`Stream selecionado: ${stream.description}`);
+    
   };
 
   useEffect(() => {

@@ -49,7 +49,6 @@ class RadioService {
         throw new Error('Resposta da API não é um array válido');
       }
 
-      // Extrai as URLs e filtra apenas as ativas
       const activeUrls = data.data
         .map(item => item.urls)
         .filter(url => url.isActive);
@@ -116,7 +115,6 @@ class RadioService {
     try {
       const activeUrls = await this.getActiveRadioUrls();
       
-      // Se stationId for especificado, filtra por estação
       const urlsToUse = stationId 
         ? activeUrls.filter(url => url.stationId === stationId)
         : activeUrls;
@@ -125,7 +123,6 @@ class RadioService {
         throw new Error('Nenhuma URL de rádio ativa encontrada');
       }
 
-      // Retorna no formato esperado pelo código existente
       return {
         data: urlsToUse.map(url => ({ urls: url })),
         error: undefined
@@ -143,7 +140,6 @@ class RadioService {
     try {
       const activeUrls = await this.getActiveRadioUrls();
       
-      // Filtra apenas streams de rádio (typeId 1 e 12)
       const radioStreams = activeUrls.filter(url => 
         url.typeId === 1 || url.typeId === 12
       );

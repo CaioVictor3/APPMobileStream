@@ -49,23 +49,23 @@ export interface NewsItem {
         const data = await response.json();
         console.log('Resposta da API:', data);
   
-        // Verifica se a resposta tem a estrutura esperada
+
         if (data.success === false && Array.isArray(data.data)) {
-          // Estrutura da API: { success: false, data: [{ urls: {...} }] }
+
           const newsUrls = data.data
             .map((item: any) => item.urls)
-            .filter((url: any) => url && url.isActive && url.typeId === 3); // typeId 3 = notícias
+            .filter((url: any) => url && url.isActive && url.typeId === 3); 
           
           console.log(`URLs de notícias encontradas: ${newsUrls.length}`);
           return newsUrls;
         } else if (Array.isArray(data)) {
-          // Se for um array direto de NewsUrl
+
           return data.filter((item: any) => item.isActive && item.typeId === 3);
         } else if (data.urls && Array.isArray(data.urls)) {
-          // Se for um objeto com propriedade urls
+
           return data.urls.filter((item: any) => item.isActive && item.typeId === 3);
         } else if (data.urls && typeof data.urls === 'object' && !Array.isArray(data.urls)) {
-          // Se for um objeto único com urls
+
           return (data.urls.isActive && data.urls.typeId === 3) ? [data.urls] : [];
         } else {
           console.warn('Estrutura de resposta inesperada da API:', data);
@@ -73,17 +73,16 @@ export interface NewsItem {
         }
       } catch (error) {
         console.error('Erro ao buscar URLs de notícias da API:', error);
-        // Em caso de erro, retorna array vazio em vez de lançar exceção
         return [];
       }
     }
   
     static async getNews(stationId?: number): Promise<NewsItem[]> {
       try {
-        // Busca URLs ativas
+
         const activeUrls = await this.getActiveNewsUrls();
         
-        // Se stationId for especificado, filtra por station
+
         const urlsToUse = stationId 
           ? activeUrls.filter(url => url.stationId === stationId)
           : activeUrls;
@@ -93,7 +92,7 @@ export interface NewsItem {
           return [];
         }
   
-        // Busca notícias de todas as URLs ativas
+
         const allNews: NewsItem[] = [];
         
         for (const urlInfo of urlsToUse) {
@@ -115,7 +114,7 @@ export interface NewsItem {
             const xmlText = await response.text();
             console.log(`Resposta recebida de ${urlInfo.description}: ${xmlText.length} caracteres`);
         
-            // Parse do XML RSS usando regex (compatível com React Native)
+
             const itemRegex = /<item>([\s\S]*?)<\/item>/g;
             let match;
             let itemCount = 0;
@@ -144,25 +143,25 @@ export interface NewsItem {
             console.log(`Processadas ${itemCount} notícias de ${urlInfo.description}`);
           } catch (urlError) {
             console.warn(`Erro ao processar URL ${urlInfo.url}:`, urlError);
-            // Continua processando outras URLs mesmo se uma falhar
+
           }
         }
   
         console.log(`Total de notícias coletadas: ${allNews.length}`);
   
-        // Remove duplicatas baseado no link
+
         const uniqueNews = allNews.filter((news, index, self) => 
           index === self.findIndex(n => n.link === news.link)
         );
   
         console.log(`Notícias únicas após remoção de duplicatas: ${uniqueNews.length}`);
   
-        // Ordena por data de publicação (mais recente primeiro)
+
         const sortedNews = uniqueNews.sort((a, b) => {
           const dateA = new Date(a.pubDate).getTime();
           const dateB = new Date(b.pubDate).getTime();
           
-          // Se as datas são inválidas, usa a ordem de chegada
+
           if (isNaN(dateA) && isNaN(dateB)) return 0;
           if (isNaN(dateA)) return 1;
           if (isNaN(dateB)) return -1;
@@ -170,7 +169,7 @@ export interface NewsItem {
           return dateB - dateA;
         });
   
-        // Filtra apenas notícias dos últimos 7 dias para manter relevância
+
         const recentNews = sortedNews.filter(newsItem => {
           const newsDate = new Date(newsItem.pubDate);
           const weekAgo = new Date();
@@ -181,17 +180,17 @@ export interface NewsItem {
   
         console.log(`Notícias dos últimos 7 dias: ${recentNews.length} de ${sortedNews.length} total`);
         
-        return recentNews.length > 0 ? recentNews : sortedNews.slice(0, 10); // Fallback para as 10 mais recentes
+        return recentNews.length > 0 ? recentNews : sortedNews.slice(0, 10); 
       } catch (error) {
         console.error('Erro ao buscar notícias:', error);
-        // Retorna array vazio em caso de erro, em vez de lançar exceção
+
         return [];
       }
     }
   
     private static extractTagContent(xml: string, tagName: string): string {
       try {
-        // Regex mais robusta para extrair conteúdo de tags XML
+
         const regex = new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, 'i');
         const match = xml.match(regex);
         if (match && match[1]) {
@@ -207,7 +206,7 @@ export interface NewsItem {
     private static cleanText(text: string): string {
       if (!text) return '';
       
-      // Remove tags HTML e limpa o texto
+
       return text
         .replace(/<[^>]*>/g, '') // Remove todas as tags HTML
         .replace(/&nbsp;/g, ' ') // Espaços não-quebrados

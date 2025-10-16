@@ -3,18 +3,18 @@ import { ThemedView } from "@/components/themed-view";
 import { NewsItem, noticiasRadioService } from "@/services/noticiasRadioService";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    Image,
-    Linking,
-    Modal,
-    RefreshControl,
-    ScrollView,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Linking,
+  Modal,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function NoticiasRadioScreen() {
@@ -59,7 +59,7 @@ export default function NoticiasRadioScreen() {
   }, []);
 
   useEffect(() => {
-    // Filtrar notícias quando o termo de busca mudar (baseado no script JavaScript)
+
     const filtered = noticiasRadioService.filterNews(news, searchTerm);
     setFilteredNews(filtered);
     setCurrentPage(1);

@@ -20,7 +20,7 @@ const API_KEY = "AU-ecOv8l6DtKaRqZSQC4cfm1AD5hePO";
 interface RawNews {
   title?: string;
   author?: string;
-  auhor?: string; // Mantido para compatibilidade com o script original
+  auhor?: string; 
   category?: string;
   summary?: string;
   pubUri?: string;
@@ -30,7 +30,6 @@ interface RawNews {
   publishedDate?: string;
 }
 
-// Função auxiliar para retry com backoff exponencial
 const retryWithBackoff = async <T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
@@ -57,7 +56,6 @@ const retryWithBackoff = async <T>(
 };
 
 export const noticiasRadioService = {
-  // Buscar todas as notícias disponíveis
   async getAllNews(): Promise<NewsItem[]> {
     try {
       console.log("[NoticiasRadioService] Carregando todas as notícias disponíveis");
@@ -72,7 +70,6 @@ export const noticiasRadioService = {
 
         console.log("[NoticiasRadioService] Resposta da API recebida:", response.status);
         
-        // A API retorna { success: boolean, data: { totalItens: number, result: array }, message: string, errors: null }
         const apiResponse = response.data as any;
         
         if (!apiResponse.success) {
@@ -91,11 +88,11 @@ export const noticiasRadioService = {
 
         const processedNews = rawData
           .map((news: RawNews, index: number) => ({
-            id: index + 1, // Gerar ID baseado no índice
+            id: index + 1, 
             title: news.title ?? "Sem título",
             description: news.summary ?? "",
             imageUrl: news.imageUri ?? "",
-            author: news.author ?? news.auhor ?? "N/A", // Suporte para ambos os campos
+            author: news.author ?? news.auhor ?? "N/A",
             category: news.category ?? news.sourceRss ?? "N/A",
             publishedAt: news.publishedDate ?? new Date().toISOString(),
             summary: news.summary ?? "",
@@ -103,7 +100,7 @@ export const noticiasRadioService = {
             sourceRss: news.sourceRss ?? undefined,
             contentEncoded: news.contentEncoded ?? undefined,
           }))
-          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()); // Ordena por data de publicação (mais recentes primeiro)
+          .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()); 
 
         console.log(`[NoticiasRadioService] ${processedNews.length} notícias processadas com sucesso`);
         return processedNews;
@@ -118,7 +115,6 @@ export const noticiasRadioService = {
     }
   },
 
-  // Filtrar notícias por termo de busca (baseado no script JavaScript)
   filterNews(news: NewsItem[], searchTerm: string): NewsItem[] {
     if (!searchTerm.trim()) {
       return news;
@@ -130,14 +126,12 @@ export const noticiasRadioService = {
     );
   },
 
-  // Paginar notícias (baseado no script JavaScript)
   paginateNews(news: NewsItem[], currentPage: number, entriesPerPage: number): NewsItem[] {
     const startIndex = (currentPage - 1) * entriesPerPage;
     const endIndex = startIndex + entriesPerPage;
     return news.slice(startIndex, endIndex);
   },
 
-  // Calcular total de páginas (baseado no script JavaScript)
   getTotalPages(totalItems: number, entriesPerPage: number): number {
     return Math.ceil(totalItems / entriesPerPage);
   }

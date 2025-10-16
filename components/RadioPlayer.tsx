@@ -62,7 +62,7 @@ export default function RadioPlayer({
       setIsLoading(true);
       setError(null);
 
-      // Usar streamUrl passada como prop ou buscar da API
+
       let url: string;
       if (streamUrl) {
         url = streamUrl;
@@ -72,7 +72,7 @@ export default function RadioPlayer({
         setCurrentStreamUrl(url);
       }
 
-      // Carregar o áudio
+
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: url },
         { shouldPlay }
@@ -80,18 +80,14 @@ export default function RadioPlayer({
 
       setSound(newSound);
 
-      // Configurar listeners
+
       newSound.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded) {
           setIsPlaying(status.isPlaying);
         }
       });
 
-      if (shouldPlay) {
-        Alert.alert('Sucesso', 'Rádio iniciada automaticamente!');
-      } else {
-        Alert.alert('Sucesso', 'Stream carregado! Toque no botão play para reproduzir.');
-      }
+      
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido';
       setError(errorMessage);
@@ -121,20 +117,17 @@ export default function RadioPlayer({
   };
 
   const stop = async () => {
-    // Sua verificação inicial está perfeita!
     if (sound) {
       try {
-        // Chamar unloadAsync() é o suficiente.
-        // Ele já para a reprodução ANTES de descarregar o som da memória.
-        // Chamar stopAsync() antes é desnecessário e causa o erro.
+
         await sound.unloadAsync();
   
-        // O resto do seu código para limpar o estado está correto.
+
         setSound(null);
         setIsPlaying(false);
         setCurrentStreamUrl(null);
       } catch (err) {
-        // Boa prática: podemos ajustar a mensagem de erro para ser mais precisa.
+
         console.error('Erro ao descarregar o áudio:', err);
       }
     }
