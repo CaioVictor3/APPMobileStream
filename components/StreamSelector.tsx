@@ -24,18 +24,18 @@ export default function StreamSelector({ streams, selectedStream, onStreamSelect
   const getStreamColor = (typeId: number) => {
     switch (typeId) {
       case 1:
-        return '#6366f1';
+        return '#0097A7';
       case 12:
-        return '#8b5cf6';
+        return '#0097A7';
       default:
-        return '#6366f1';
+        return '#0097A7';
     }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Ionicons name="radio" size={24} color="#6366f1" />
+        <Ionicons name="radio" size={24} color="#0097A7" />
         <Text style={styles.headerTitle}>Escolha uma Estação</Text>
       </View>
       
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   selectedStream: {
-    borderColor: '#6366f1',
+    borderColor: '#0097A7',
     elevation: 4,
     shadowOpacity: 0.15,
   },

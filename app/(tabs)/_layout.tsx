@@ -31,9 +31,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="publicidade"
+        name="noticiasRadio"
         options={{
-          title: 'Publicidadde',
+          title: 'Noticias da Rádio',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="radio.fill" color={color} />,
         }}
       />

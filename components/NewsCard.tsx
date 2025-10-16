@@ -25,7 +25,7 @@ export default function NewsCard({ newsItem, onPress, index = 0 }: NewsCardProps
 
   // Determina a cor do badge baseado no índice
   const getBadgeColor = (index: number) => {
-    const colors = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+    const colors = ['#0097A7', '#0097A7', '#ec4899', '#f59e0b', '#10b981'];
     return colors[index % colors.length];
   };
 
@@ -56,7 +56,7 @@ export default function NewsCard({ newsItem, onPress, index = 0 }: NewsCardProps
           
           <View style={styles.linkContainer}>
             <Text style={styles.linkText}>Ler mais</Text>
-            <Ionicons name="arrow-forward-circle" size={20} color="#6366f1" />
+            <Ionicons name="arrow-forward-circle" size={20} color="#0097A7" />
           </View>
         </View>
       </View>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#6366f1',
+    color: '#0097A7',
     fontWeight: '600',
   },
 });

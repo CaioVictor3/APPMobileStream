@@ -62,7 +62,7 @@ export default function RadioScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6366f1" />
+        <ActivityIndicator size="large" color="#0097A7" />
         <ThemedText style={styles.loadingText}>Carregando estações...</ThemedText>
       </View>
     );
@@ -75,8 +75,8 @@ export default function RadioScreen() {
         <RefreshControl 
           refreshing={refreshing} 
           onRefresh={onRefresh}
-          colors={['#6366f1']}
-          tintColor="#6366f1"
+          colors={['#0097A7']}
+          tintColor="#0097A7"
         />
       }
     >
@@ -108,7 +108,7 @@ export default function RadioScreen() {
           {selectedStream && (
             <View style={styles.playerSection}>
               <View style={styles.playerHeader}>
-                <Ionicons name="play-circle" size={24} color="#6366f1" />
+                <Ionicons name="play-circle" size={24} color="#0097A7" />
                 <ThemedText style={styles.playerTitle}>Player de Rádio</ThemedText>
               </View>
               <RadioPlayer 
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   header: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#0097A7',
     paddingTop: 50,
     paddingBottom: 24,
     paddingHorizontal: 20,
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   refreshButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#6366f1',
+    backgroundColor: '#0097A7',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 25,

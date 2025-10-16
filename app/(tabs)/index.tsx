@@ -2,13 +2,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Alert,
+    RefreshControl,
+    ScrollView,
+    StyleSheet,
+    TouchableOpacity,
+    View
 } from 'react-native';
 
 import NewsCard from '@/components/NewsCard';
@@ -97,8 +97,8 @@ export default function HomeScreen() {
           <RefreshControl 
             refreshing={refreshing} 
             onRefresh={onRefresh}
-            colors={['#6366f1']}
-            tintColor="#6366f1"
+            colors={['#0097A7']}
+            tintColor="#0097A7"
           />
         }
       >
@@ -121,7 +121,7 @@ export default function HomeScreen() {
         ) : (
           <>
             <View style={styles.newsHeader}>
-              <Ionicons name="trending-up" size={20} color="#6366f1" />
+              <Ionicons name="trending-up" size={20} color="#0097A7" />
               <ThemedText style={styles.newsHeaderText}>Últimas Notícias</ThemedText>
             </View>
             {news.map((item, index) => (
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   header: {
-    backgroundColor: '#6366f1',
+    backgroundColor: '#0097A7',
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   refreshButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#6366f1',
+    backgroundColor: '#0097A7',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 25,
