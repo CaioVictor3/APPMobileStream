@@ -1,50 +1,169 @@
-# Welcome to your Expo app 👋
+# 📻 AppStream - Aplicativo de Rádio Online
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Um aplicativo React Native moderno para reprodução de rádio online, desenvolvido com Expo e TypeScript.
 
-## Get started
+## 📋 Pré-requisitos
 
-1. Install dependencies
+Antes de começar, certifique-se de ter instalado:
 
-   ```bash
-   npm install
-   ```
+- **Node.js** (versão 18 ou superior)
+- **npm** ou **yarn**
+- **Expo CLI**: `npm install -g @expo/cli`
+- **Git**
 
-2. Start the app
+### Para desenvolvimento móvel:
+- **Android Studio** (para emulador Android)
+- **Xcode** (para simulador iOS - apenas macOS)
 
-   ```bash
-   npx expo start
-   ```
+## 🛠️ Instalação e Configuração
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+### 1. Clone o repositório
 ```bash
+git clone <url-do-repositorio>
+cd AppStream
+```
+
+### 2. Instale as dependências
+```bash
+npm install
+```
+
+### 3. Configuração da API (Opcional)
+Crie um arquivo `.env` na raiz do projeto para configurar sua própria chave de API:
+```bash
+EXPO_PUBLIC_API_KEY=sua_chave_aqui
+```
+
+### 4. Verifique a configuração
+```bash
+# Verificar se tudo está configurado corretamente
+npm run lint
+```
+
+## 🚀 Como Executar
+
+### Desenvolvimento
+```bash
+# Iniciar o servidor de desenvolvimento
+npm start
+# ou
+npx expo start
+```
+
+### Executar em plataformas específicas
+```bash
+# Android
+npm run android
+# ou
+npx expo start --android
+
+# iOS (apenas macOS)
+npm run ios
+# ou
+npx expo start --ios
+
+# Web
+npm run web
+# ou
+npx expo start --web
+```
+
+### Outros comandos úteis
+```bash
+# Executar linter
+npm run lint
+
+# Resetar projeto (remover código de exemplo)
 npm run reset-project
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🏗️ Estrutura do Projeto
 
-## Learn more
+```
+AppStream/
+├── app/                          # Navegação e telas principais
+│   ├── (tabs)/                   # Telas com navegação por abas
+│   │   ├── index.tsx             # Tela inicial (notícias)
+│   │   ├── radio.tsx             # Player de rádio
+│   │   └── noticiasRadio.tsx     # Notícias da rádio
+│   ├── _layout.tsx               # Layout principal
+│   └── modal.tsx                 # Modal de configurações
+├── components/                   # Componentes reutilizáveis
+│   ├── RadioPlayer.tsx           # Player de áudio
+│   ├── NewsCard.tsx              # Card de notícias
+│   ├── StreamSelector.tsx        # Seletor de estações
+│   └── ui/                       # Componentes de interface
+├── constants/                    # Configurações e constantes
+│   ├── theme.ts                  # Cores e temas
+│   └── radioConfig.ts            # Configuração da API de rádio
+├── services/                     # Serviços e APIs
+│   ├── radioService.ts           # Serviço de rádio
+│   ├── newsService.ts            # Serviço de notícias
+│   └── noticiasRadioService.ts   # Serviço de notícias da rádio
+├── hooks/                        # Hooks personalizados
+├── assets/                       # Imagens e recursos
+└── scripts/                      # Scripts de utilitários
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## 🔧 Scripts Disponíveis
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Comando | Descrição |
+|---------|-----------|
+| `npm start` | Inicia o servidor de desenvolvimento |
+| `npm run android` | Executa no emulador Android |
+| `npm run ios` | Executa no simulador iOS |
+| `npm run web` | Executa no navegador web |
+| `npm run lint` | Executa o linter para verificar código |
+| `npm run reset-project` | Remove código de exemplo |
 
-## Join the community
+## 📦 Dependências Principais
 
-Join our community of developers creating universal apps.
+- **React Native**: Framework principal
+- **Expo**: Plataforma de desenvolvimento
+- **TypeScript**: Tipagem estática
+- **Expo Router**: Navegação baseada em arquivos
+- **Expo AV**: Reprodução de áudio
+- **Axios**: Cliente HTTP
+- **React Navigation**: Navegação entre telas
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🐛 Solução de Problemas
+
+### Problemas comuns:
+
+1. **Erro de dependências**
+   ```bash
+   # Limpar cache e reinstalar
+   npm cache clean --force
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
+
+2. **Problemas com Expo CLI**
+   ```bash
+   # Atualizar Expo CLI
+   npm install -g @expo/cli@latest
+   ```
+
+3. **Erro de Metro bundler**
+   ```bash
+   # Limpar cache do Metro
+   npx expo start --clear
+   ```
+
+
+
+## 🔄 Atualizações
+
+Para manter o projeto atualizado:
+```bash
+# Atualizar Expo CLI
+npm install -g @expo/cli@latest
+
+# Atualizar dependências
+npx expo install --fix
+
+# Verificar atualizações do Expo
+npx expo doctor
+```
+
+---
