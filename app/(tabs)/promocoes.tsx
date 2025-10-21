@@ -176,9 +176,31 @@ export default function PromocoesScreen() {
     return pages;
   };
 
+  // Função para revalidar e tentar novamente
+  const handleRetry = () => {
+    // Revalida a configuração da API
+    const validation = validateApiConfig();
+    
+    if (!validation.isValid) {
+      // Se ainda estiver inválida, mantém o erro
+      setConfigError(validation.error || 'Erro de configuração');
+      return;
+    }
+    
+    // Se estiver válida agora, limpa o erro e carrega os dados
+    setConfigError(null);
+    setLoading(true);
+    loadAds();
+  };
+
   // Exibe erro de configuração se houver
   if (configError) {
-    return <ApiConfigError errorMessage={configError} />;
+    return (
+      <ApiConfigError 
+        errorMessage={configError} 
+        onRetry={handleRetry}
+      />
+    );
   }
 
   if (loading) {

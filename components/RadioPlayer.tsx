@@ -3,13 +3,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 interface RadioPlayerProps {
@@ -187,8 +187,8 @@ export default function RadioPlayer({
             {isLoading 
               ? 'Carregando stream...' 
               : isPlaying 
-                ? '🔊 Reproduzindo ao vivo' 
-                : '⏸️ Pronto para reproduzir'
+                ? 'Reproduzindo ao vivo' 
+                : 'Pronto para reproduzir'
             }
           </Text>
         </View>

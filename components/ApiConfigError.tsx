@@ -1,17 +1,31 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from './themed-text';
 import { ThemedView } from './themed-view';
 
 interface ApiConfigErrorProps {
   errorMessage: string;
+  onRetry?: () => void | Promise<void>;
 }
 
 /**
  * Componente que exibe um erro visual bonito quando a configuração da API está incorreta
  */
-export default function ApiConfigError({ errorMessage }: ApiConfigErrorProps) {
+export default function ApiConfigError({ errorMessage, onRetry }: ApiConfigErrorProps) {
+  const [isRetrying, setIsRetrying] = useState(false);
+
+  const handleRetry = async () => {
+    if (!onRetry) return;
+    
+    setIsRetrying(true);
+    try {
+      await onRetry();
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
       <View style={styles.content}>
@@ -66,6 +80,32 @@ export default function ApiConfigError({ errorMessage }: ApiConfigErrorProps) {
             Sem uma API Key válida, o aplicativo não conseguirá carregar os dados da API.
           </ThemedText>
         </View>
+
+        {/* Botão de Retry */}
+        {onRetry && (
+          <TouchableOpacity
+            style={[styles.retryButton, isRetrying && styles.retryButtonDisabled]}
+            onPress={handleRetry}
+            disabled={isRetrying}
+            activeOpacity={0.8}
+          >
+            {isRetrying ? (
+              <>
+                <ActivityIndicator size="small" color="white" />
+                <ThemedText style={styles.retryButtonText}>
+                  Verificando...
+                </ThemedText>
+              </>
+            ) : (
+              <>
+                <Ionicons name="refresh" size={20} color="white" />
+                <ThemedText style={styles.retryButtonText}>
+                  Tentar Novamente
+                </ThemedText>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
       </View>
     </ThemedView>
   );
@@ -163,12 +203,37 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: '#0097A7',
     gap: 12,
+    marginBottom: 24,
   },
   warningText: {
     flex: 1,
     fontSize: 14,
     color: '#0c4a6e',
     lineHeight: 20,
+  },
+  retryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#0097A7',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    gap: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  retryButtonDisabled: {
+    backgroundColor: '#9ca3af',
+    opacity: 0.7,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
