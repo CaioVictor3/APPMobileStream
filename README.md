@@ -85,7 +85,7 @@ AppStream/
 │   ├── (tabs)/                   # Telas com navegação por abas
 │   │   ├── index.tsx             # Tela inicial (notícias)
 │   │   ├── radio.tsx             # Player de rádio
-│   │   └── noticiasRadio.tsx     # Notícias da rádio
+│   │   └── promocoes.tsx         # Publicidades da rádio (isAd=true)
 │   ├── _layout.tsx               # Layout principal
 │   └── modal.tsx                 # Modal de configurações
 ├── components/                   # Componentes reutilizáveis
@@ -99,7 +99,7 @@ AppStream/
 ├── services/                     # Serviços e APIs
 │   ├── radioService.ts           # Serviço de rádio
 │   ├── newsService.ts            # Serviço de notícias
-│   └── noticiasRadioService.ts   # Serviço de notícias da rádio
+│   └── promocoesRadioService.ts  # Serviço de publicidades da rádio
 ├── hooks/                        # Hooks personalizados
 ├── assets/                       # Imagens e recursos
 └── scripts/                      # Scripts de utilitários
