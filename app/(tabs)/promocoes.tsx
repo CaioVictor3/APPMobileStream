@@ -12,9 +12,8 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 export default function PromocoesScreen() {
@@ -145,7 +144,6 @@ export default function PromocoesScreen() {
       );
     }
 
-    // Botão próximo (baseado no script JavaScript)
     pages.push(
       <TouchableOpacity
         key="next"
@@ -153,6 +151,7 @@ export default function PromocoesScreen() {
         onPress={() => goToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
+        
         <ThemedText style={[styles.paginationButtonText, currentPage === totalPages && styles.paginationButtonTextDisabled]}>
           »
         </ThemedText>
@@ -174,17 +173,6 @@ export default function PromocoesScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.headerTitle}>Promoções da Rádio</ThemedText>
-
-      {/* Barra de busca */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar promoções..."
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-          placeholderTextColor="#9ca3af"
-        />
-      </View>
 
       {/* Informações de paginação */}
       <View style={styles.paginationInfo}>
@@ -227,10 +215,8 @@ export default function PromocoesScreen() {
               <View style={styles.infoContainer}>
                 <ThemedText style={styles.title}>{item.title}</ThemedText>
                 
+                
                 <View style={styles.metaContainer}>
-                  <ThemedText style={[styles.category, item.isActive ? styles.activeStatus : styles.inactiveStatus]}>
-                    {item.isActive ? "🟢 Ativa" : "🔴 Inativa"}
-                  </ThemedText>
                   {item.isAd && <ThemedText style={styles.adBadge}>📢 Publicidade</ThemedText>}
                 </View>
                 
@@ -297,10 +283,12 @@ export default function PromocoesScreen() {
               <ThemedText style={styles.modalNewsTitle}>{selectedAd.title}</ThemedText>
               
               <View style={styles.modalMetaContainer}>
+                {/*
                 <ThemedText style={[styles.modalCategory, selectedAd.isActive ? styles.activeStatus : styles.inactiveStatus]}>
                   Status: {selectedAd.isActive ? "Ativa 🟢" : "Inativa 🔴"}
                 </ThemedText>
-                {selectedAd.isAd && <ThemedText style={styles.adBadge}>📢 Publicidade</ThemedText>}
+                */}
+                {selectedAd.isAd && <ThemedText style={styles.adBadge}>Publicidade</ThemedText>}
               </View>
               
               <ThemedText style={styles.modalPublishedAt}>
@@ -313,7 +301,7 @@ export default function PromocoesScreen() {
               
               {selectedAd.dateUndefined && (
                 <ThemedText style={styles.modalPublishedAt}>
-                  ⏰ Data indefinida
+                  Data indefinida
                 </ThemedText>
               )}
               

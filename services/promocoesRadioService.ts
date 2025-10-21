@@ -68,11 +68,7 @@ const retryWithBackoff = async <T>(
 };
 
 export const promocoesRadioService = {
-  /**
-   * Carrega apenas as PROMOÇÕES ATIVAS da API
-   * Filtra por: isActive === true
-   * NÃO filtra por data de vencimento (endDate)
-   */
+
   async getAllAds(): Promise<PromotionItem[]> {
     try {
       return await retryWithBackoff(async () => {

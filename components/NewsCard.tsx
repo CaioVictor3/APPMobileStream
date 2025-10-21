@@ -1,4 +1,4 @@
-import { NewsItem, NewsService } from '@/services/newsService';
+import { NewsItem } from '@/services/newsService';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -31,10 +31,7 @@ export default function NewsCard({ newsItem, onPress, index = 0 }: NewsCardProps
 
   return (
     <TouchableOpacity style={styles.container} onPress={handlePress} activeOpacity={0.7}>
-      <View style={styles.badge}>
-        <View style={[styles.badgeDot, { backgroundColor: getBadgeColor(index) }]} />
-      </View>
-      
+
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title} numberOfLines={2}>
@@ -46,14 +43,9 @@ export default function NewsCard({ newsItem, onPress, index = 0 }: NewsCardProps
           {newsItem.description}
         </Text>
         
+
         <View style={styles.footer}>
-          <View style={styles.dateContainer}>
-            <Ionicons name="time-outline" size={16} color="#64748b" />
-            <Text style={styles.date}>
-              {NewsService.formatDate(newsItem.pubDate)}
-            </Text>
-          </View>
-          
+
           <View style={styles.linkContainer}>
             <Text style={styles.linkText}>Ler mais</Text>
             <Ionicons name="arrow-forward-circle" size={20} color="#0097A7" />
