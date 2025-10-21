@@ -31,35 +31,21 @@ export default function PromocoesScreen() {
 
   const loadAds = async () => {
     try {
-      console.log("[PromocoesScreen] ========================================");
-      console.log("[PromocoesScreen] Iniciando carregamento de promoções");
-      console.log("[PromocoesScreen] ========================================");
       setLoading(true);
-      
       const data = await promocoesRadioService.getAllAds();
       
-      console.log(`[PromocoesScreen] Resposta recebida: ${data.length} promoções`);
-      
       if (data.length === 0) {
-        console.warn("[PromocoesScreen] ⚠️ NENHUMA promoção ativa foi retornada pela API");
-        console.warn("[PromocoesScreen] Possíveis motivos:");
-        console.warn("[PromocoesScreen] 1. Não há promoções cadastradas com isActive=true");
-        console.warn("[PromocoesScreen] 2. Erro na API ou chave de API inválida");
-        console.warn("[PromocoesScreen] 3. Problema de conexão");
         Alert.alert(
           "Aviso", 
-          "Nenhuma promoção ativa foi encontrada.\n\nVerifique:\n• Se há promoções cadastradas\n• Se o campo 'isActive' está marcado como true\n• Conexão com internet"
+          "Nenhuma promoção ativa foi encontrada."
         );
-      } else {
-        console.log(`[PromocoesScreen] ✅ ${data.length} promoções ativas carregadas com sucesso`);
-        console.log(`[PromocoesScreen] Primeira promoção: ${data[0]?.title || 'N/A'}`);
       }
 
       setAds(data);
       setFilteredAds(data);
       setTotalPages(promocoesRadioService.getTotalPages(data.length, entriesPerPage));
     } catch (error) {
-      console.error("[PromocoesScreen] ❌ Erro ao carregar promoções:", error);
+      console.error("Erro ao carregar promoções:", error);
       Alert.alert("Erro", "Não foi possível carregar as promoções. Verifique sua conexão e tente novamente.");
     } finally {
       setLoading(false);

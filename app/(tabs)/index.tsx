@@ -23,9 +23,7 @@ export default function HomeScreen() {
 
   const loadNews = async () => {
     try {
-      console.log('Iniciando carregamento de notícias...');
       const newsData = await NewsService.getNews();
-      console.log(`Notícias carregadas: ${newsData.length}`);
       setNews(newsData);
       
       if (newsData.length === 0) {

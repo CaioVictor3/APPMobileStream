@@ -28,8 +28,6 @@ class RadioService {
 
   async getActiveRadioUrls(): Promise<RadioUrl[]> {
     try {
-      console.log('Buscando URLs de rádio ativas...');
-      
       const response = await fetch(this.baseUrl, {
         method: 'GET',
         headers: {
@@ -53,7 +51,6 @@ class RadioService {
         .map(item => item.urls)
         .filter(url => url.isActive);
 
-      console.log(`${activeUrls.length} URLs de rádio ativas obtidas com sucesso`);
       return activeUrls;
     } catch (error) {
       console.error("Erro ao acessar API externa:", error);
@@ -70,7 +67,6 @@ class RadioService {
       );
 
       if (radioCentralItem && radioCentralItem.url) {
-        console.log("URL da Radio Central 91.9:", radioCentralItem.url);
         return radioCentralItem.url;
       } else {
         throw new Error("Radio Central 91.9 não encontrada nos dados recebidos.");
@@ -144,7 +140,6 @@ class RadioService {
         url.typeId === 1 || url.typeId === 12
       );
 
-      console.log(`${radioStreams.length} streams de rádio encontrados`);
       return radioStreams;
     } catch (error) {
       console.error('Erro ao buscar streams de rádio:', error);

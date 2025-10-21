@@ -60,7 +60,6 @@ const retryWithBackoff = async <T>(
       }
       
       const delay = baseDelay * Math.pow(2, attempt);
-      console.log(`[PromocoesRadioService] Tentativa ${attempt + 1} falhou, tentando novamente em ${delay}ms`);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
@@ -76,8 +75,6 @@ export const promocoesRadioService = {
    */
   async getAllAds(): Promise<PromotionItem[]> {
     try {
-      console.log("[PromocoesRadioService] Carregando promoções ATIVAS (isActive=true)");
-      
       return await retryWithBackoff(async () => {
         const allPromotions: PromotionItem[] = [];
         let currentPage = 1;
@@ -86,7 +83,6 @@ export const promocoesRadioService = {
 
         // Buscar todas as páginas disponíveis
         while (hasMorePages) {
-          console.log(`[PromocoesRadioService] Buscando página ${currentPage}`);
           
           const response = await axios.get(API_URL, {
             params: {
@@ -100,19 +96,10 @@ export const promocoesRadioService = {
             },
           });
 
-          console.log(`[PromocoesRadioService] Resposta da API recebida para página ${currentPage}:`, response.status);
-          console.log(`[PromocoesRadioService] Estrutura da resposta:`, JSON.stringify(response.data, null, 2).substring(0, 500));
-          
           const apiResponse = response.data as any;
           
-          console.log(`[PromocoesRadioService] API Response - success:`, apiResponse.success);
-          console.log(`[PromocoesRadioService] API Response - message:`, apiResponse.message);
-          console.log(`[PromocoesRadioService] API Response - data type:`, typeof apiResponse.data);
-          console.log(`[PromocoesRadioService] API Response - data is array?:`, Array.isArray(apiResponse.data));
-          
           if (!apiResponse.success) {
-            console.error("[PromocoesRadioService] ❌ API retornou success=false:", apiResponse.message);
-            console.error("[PromocoesRadioService] Response completa:", JSON.stringify(apiResponse, null, 2));
+            console.error("[PromocoesRadioService] API retornou erro:", apiResponse.message);
             break;
           }
 
@@ -123,38 +110,18 @@ export const promocoesRadioService = {
           
           if (Array.isArray(rawData)) {
             promotionsArray = rawData;
-            console.log(`[PromocoesRadioService] rawData é um array com ${rawData.length} itens`);
           } else if (rawData && typeof rawData === 'object') {
-            // Se for um único objeto, colocar em array
             promotionsArray = [rawData];
-            console.log(`[PromocoesRadioService] rawData é um objeto único, convertido para array`);
-          } else {
-            console.warn(`[PromocoesRadioService] ⚠️ rawData tem tipo inesperado:`, typeof rawData, rawData);
           }
 
           if (promotionsArray.length === 0) {
-            console.warn(`[PromocoesRadioService] ⚠️ promotionsArray está vazio para página ${currentPage}`);
             hasMorePages = false;
             break;
           }
 
-          console.log(`[PromocoesRadioService] Processando ${promotionsArray.length} itens da página ${currentPage}`);
-          
-          // Log de debug: mostrar quantas são ativas vs inativas
-          const activeCount = promotionsArray.filter((promo: RawPromotion) => promo.isActive === true).length;
-          const inactiveCount = promotionsArray.filter((promo: RawPromotion) => promo.isActive !== true).length;
-          console.log(`[PromocoesRadioService] Página ${currentPage}: ${activeCount} ativas, ${inactiveCount} inativas`);
-
           // Filtra apenas promoções ATIVAS (isActive === true)
-          // NÃO FILTRA POR DATA - mostra todas, vencidas ou não
           const processedPromotions = promotionsArray
-            .filter((promo: RawPromotion) => {
-              const isActive = promo.isActive === true;
-              if (!isActive) {
-                console.log(`[PromocoesRadioService] Item ignorado (inativo): ${promo.title || 'sem título'}`);
-              }
-              return isActive;
-            })
+            .filter((promo: RawPromotion) => promo.isActive === true)
             .map((promo: RawPromotion) => {
               const promotion = {
                 id: promo.id ?? 0,
@@ -174,8 +141,6 @@ export const promocoesRadioService = {
                 intervalValue: promo.intervalValue,
                 lastRaffle: promo.lastRaffle,
               };
-              
-              console.log(`[PromocoesRadioService] Promoção adicionada: ID=${promotion.id}, Título="${promotion.title}", isAd=${promotion.isAd}, Início=${promotion.startDate}, Fim=${promotion.endDate}`);
               return promotion;
             });
 
@@ -193,17 +158,6 @@ export const promocoesRadioService = {
         const sortedAds = allPromotions.sort((a, b) => 
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
         );
-
-        console.log(`[PromocoesRadioService] ========== RESUMO ==========`);
-        console.log(`[PromocoesRadioService] Total de promoções ATIVAS carregadas: ${sortedAds.length}`);
-        console.log(`[PromocoesRadioService] ================================`);
-        
-        if (sortedAds.length > 0) {
-          console.log(`[PromocoesRadioService] Primeiras 5 promoções:`);
-          sortedAds.slice(0, 5).forEach((ad, index) => {
-            console.log(`  ${index + 1}. ID=${ad.id}, Título="${ad.title}", Tipo=${ad.isAd ? 'Publicidade' : 'Promoção'}, Fim=${ad.endDate}`);
-          });
-        }
         
         return sortedAds;
       });

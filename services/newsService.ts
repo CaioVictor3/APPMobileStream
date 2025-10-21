@@ -27,11 +27,9 @@ export interface NewsItem {
     private static readonly API_BASE_URL = 'https://audieappapi.playlistsolutions.com/api/v1/Url';
     private static readonly API_KEY = 'AU-ecOv8l6DtKaRqZSQC4cfm1AD5hePO';
   
-    static async getActiveNewsUrls(): Promise<NewsUrl[]> {
-      try {
-        console.log('Buscando URLs de notícias da API...');
-        
-        const response = await fetch(this.API_BASE_URL, {
+  static async getActiveNewsUrls(): Promise<NewsUrl[]> {
+    try {
+      const response = await fetch(this.API_BASE_URL, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -47,16 +45,12 @@ export interface NewsItem {
         }
   
         const data = await response.json();
-        console.log('Resposta da API:', data);
-  
 
         if (data.success === false && Array.isArray(data.data)) {
-
           const newsUrls = data.data
             .map((item: any) => item.urls)
             .filter((url: any) => url && url.isActive && url.typeId === 3); 
           
-          console.log(`URLs de notícias encontradas: ${newsUrls.length}`);
           return newsUrls;
         } else if (Array.isArray(data)) {
 
@@ -64,13 +58,11 @@ export interface NewsItem {
         } else if (data.urls && Array.isArray(data.urls)) {
 
           return data.urls.filter((item: any) => item.isActive && item.typeId === 3);
-        } else if (data.urls && typeof data.urls === 'object' && !Array.isArray(data.urls)) {
-
-          return (data.urls.isActive && data.urls.typeId === 3) ? [data.urls] : [];
-        } else {
-          console.warn('Estrutura de resposta inesperada da API:', data);
-          return [];
-        }
+      } else if (data.urls && typeof data.urls === 'object' && !Array.isArray(data.urls)) {
+        return (data.urls.isActive && data.urls.typeId === 3) ? [data.urls] : [];
+      } else {
+        return [];
+      }
       } catch (error) {
         console.error('Erro ao buscar URLs de notícias da API:', error);
         return [];
@@ -88,17 +80,13 @@ export interface NewsItem {
           : activeUrls;
   
         if (urlsToUse.length === 0) {
-          console.warn('Nenhuma URL de notícias ativa encontrada');
           return [];
         }
-  
 
         const allNews: NewsItem[] = [];
         
         for (const urlInfo of urlsToUse) {
           try {
-            console.log(`Buscando notícias de: ${urlInfo.description} (${urlInfo.url})`);
-            
             const response = await fetch(urlInfo.url, {
               method: 'GET',
               headers: {
@@ -111,11 +99,9 @@ export interface NewsItem {
               throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
   
-            const xmlText = await response.text();
-            console.log(`Resposta recebida de ${urlInfo.description}: ${xmlText.length} caracteres`);
-        
+          const xmlText = await response.text();
 
-            const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+          const itemRegex = /<item>([\s\S]*?)<\/item>/g;
             let match;
             let itemCount = 0;
             
@@ -136,28 +122,19 @@ export interface NewsItem {
                   pubDate,
                   guid
                 });
-                itemCount++;
-              }
+              itemCount++;
             }
-            
-            console.log(`Processadas ${itemCount} notícias de ${urlInfo.description}`);
-          } catch (urlError) {
-            console.warn(`Erro ao processar URL ${urlInfo.url}:`, urlError);
-
           }
+        } catch (urlError) {
+          // Ignora erros de URLs individuais
         }
-  
-        console.log(`Total de notícias coletadas: ${allNews.length}`);
-  
+      }
 
-        const uniqueNews = allNews.filter((news, index, self) => 
-          index === self.findIndex(n => n.link === news.link)
-        );
-  
-        console.log(`Notícias únicas após remoção de duplicatas: ${uniqueNews.length}`);
-  
+      const uniqueNews = allNews.filter((news, index, self) => 
+        index === self.findIndex(n => n.link === news.link)
+      );
 
-        const sortedNews = uniqueNews.sort((a, b) => {
+      const sortedNews = uniqueNews.sort((a, b) => {
           const dateA = new Date(a.pubDate).getTime();
           const dateB = new Date(b.pubDate).getTime();
           
@@ -170,17 +147,15 @@ export interface NewsItem {
         });
   
 
-        const recentNews = sortedNews.filter(newsItem => {
-          const newsDate = new Date(newsItem.pubDate);
-          const weekAgo = new Date();
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          
-          return !isNaN(newsDate.getTime()) && newsDate >= weekAgo;
-        });
-  
-        console.log(`Notícias dos últimos 7 dias: ${recentNews.length} de ${sortedNews.length} total`);
+      const recentNews = sortedNews.filter(newsItem => {
+        const newsDate = new Date(newsItem.pubDate);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
         
-        return recentNews.length > 0 ? recentNews : sortedNews.slice(0, 10); 
+        return !isNaN(newsDate.getTime()) && newsDate >= weekAgo;
+      });
+      
+      return recentNews.length > 0 ? recentNews : sortedNews.slice(0, 10);
       } catch (error) {
         console.error('Erro ao buscar notícias:', error);
 
@@ -198,7 +173,6 @@ export interface NewsItem {
         }
         return '';
       } catch (error) {
-        console.warn(`Erro ao extrair tag ${tagName}:`, error);
         return '';
       }
     }
