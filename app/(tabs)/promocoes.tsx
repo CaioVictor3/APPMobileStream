@@ -364,19 +364,7 @@ export default function PromocoesScreen() {
                 {selectedAd.description}
               </ThemedText>
               
-              {selectedAd.isAuto && (
-                <View style={styles.autoPromoInfo}>
-                  <ThemedText style={styles.autoPromoText}>
-                    🎲 Sorteio automático
-                  </ThemedText>
-                  {selectedAd.lastRaffle && (
-                    <ThemedText style={styles.autoPromoText}>
-                      Último sorteio: {formatDate(selectedAd.lastRaffle)}
-                    </ThemedText>
-                  )}
-                </View>
-              )}
-              
+
               {selectedAd.externalUrl && (
                 <TouchableOpacity 
                   style={styles.linkButton}
