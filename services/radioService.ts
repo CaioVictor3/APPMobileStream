@@ -22,12 +22,25 @@ export interface RadioApiResponse {
   error?: string;
 }
 
+import { validateApiConfig } from '@/constants/radioConfig';
+
 class RadioService {
-  private baseUrl = RADIO_CONFIG.BASE_URL;
-  private apiKey = RADIO_CONFIG.API_KEY;
+  private get baseUrl() {
+    return `${RADIO_CONFIG.API_BASE_URL}${RADIO_CONFIG.URLS_ENDPOINT}`;
+  }
+  
+  private get apiKey() {
+    return RADIO_CONFIG.API_KEY;
+  }
 
   async getActiveRadioUrls(): Promise<RadioUrl[]> {
     try {
+      // Valida configuração da API
+      const validation = validateApiConfig();
+      if (!validation.isValid) {
+        throw new Error(validation.error);
+      }
+
       const response = await fetch(this.baseUrl, {
         method: 'GET',
         headers: {
@@ -58,21 +71,27 @@ class RadioService {
     }
   }
 
+  /**
+   * @deprecated Use getRadioStreams() para buscar todas as estações disponíveis
+   * Esta função será removida em versões futuras
+   */
   async getRadioCentralUrl(): Promise<string> {
     try {
       const activeUrls = await this.getActiveRadioUrls();
       
-      const radioCentralItem = activeUrls.find(url =>
-        url.description === RADIO_CONFIG.STATION_DESCRIPTION
+      // Retorna a primeira estação de rádio encontrada
+      const firstRadioStream = activeUrls.find(url => 
+        url.typeId === RADIO_CONFIG.TYPE_ID.RADIO_STREAM || 
+        url.typeId === RADIO_CONFIG.TYPE_ID.ONLINE_STREAM
       );
 
-      if (radioCentralItem && radioCentralItem.url) {
-        return radioCentralItem.url;
+      if (firstRadioStream && firstRadioStream.url) {
+        return firstRadioStream.url;
       } else {
-        throw new Error("Radio Central 91.9 não encontrada nos dados recebidos.");
+        throw new Error("Nenhuma estação de rádio encontrada.");
       }
     } catch (error) {
-      console.error("Erro ao buscar Radio Central:", error);
+      console.error("Erro ao buscar estação de rádio:", error);
       throw error;
     }
   }
@@ -137,7 +156,8 @@ class RadioService {
       const activeUrls = await this.getActiveRadioUrls();
       
       const radioStreams = activeUrls.filter(url => 
-        url.typeId === 1 || url.typeId === 12
+        url.typeId === RADIO_CONFIG.TYPE_ID.RADIO_STREAM || 
+        url.typeId === RADIO_CONFIG.TYPE_ID.ONLINE_STREAM
       );
 
       return radioStreams;

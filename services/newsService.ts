@@ -1,34 +1,46 @@
-
 export interface NewsItem {
-    title: string;
-    description: string;
-    link: string;
-    pubDate: string;
-    guid?: string;
+  title: string;
+  description: string;
+  link: string;
+  pubDate: string;
+  guid?: string;
+}
+
+export interface NewsUrl {
+  id: number;
+  description: string;
+  typeId: number;
+  url: string;
+  isActive: boolean;
+  createTime: string;
+  updateTime: string;
+  stationId: number;
+  station: any;
+}
+
+export interface NewsUrlResponse {
+  urls: NewsUrl;
+}
+  
+import { RADIO_CONFIG, validateApiConfig } from '@/constants/radioConfig';
+
+export class NewsService {
+  private static get API_BASE_URL() {
+    return `${RADIO_CONFIG.API_BASE_URL}${RADIO_CONFIG.NEWS_ENDPOINT}`;
   }
   
-  export interface NewsUrl {
-    id: number;
-    description: string;
-    typeId: number;
-    url: string;
-    isActive: boolean;
-    createTime: string;
-    updateTime: string;
-    stationId: number;
-    station: any;
+  private static get API_KEY() {
+    return RADIO_CONFIG.API_KEY;
   }
-  
-  export interface NewsUrlResponse {
-    urls: NewsUrl;
-  }
-  
-  export class NewsService {
-    private static readonly API_BASE_URL = 'https://audieappapi.playlistsolutions.com/api/v1/Url';
-    private static readonly API_KEY = 'AU-ecOv8l6DtKaRqZSQC4cfm1AD5hePO';
-  
+
   static async getActiveNewsUrls(): Promise<NewsUrl[]> {
     try {
+      // Valida configuração da API
+      const validation = validateApiConfig();
+      if (!validation.isValid) {
+        throw new Error(validation.error);
+      }
+
       const response = await fetch(this.API_BASE_URL, {
           method: 'GET',
           headers: {
@@ -47,19 +59,17 @@ export interface NewsItem {
         const data = await response.json();
 
         if (data.success === false && Array.isArray(data.data)) {
-          const newsUrls = data.data
-            .map((item: any) => item.urls)
-            .filter((url: any) => url && url.isActive && url.typeId === 3); 
+            const newsUrls = data.data
+              .map((item: any) => item.urls)
+              .filter((url: any) => url && url.isActive && url.typeId === RADIO_CONFIG.TYPE_ID.NEWS);
           
           return newsUrls;
         } else if (Array.isArray(data)) {
-
-          return data.filter((item: any) => item.isActive && item.typeId === 3);
+          return data.filter((item: any) => item.isActive && item.typeId === RADIO_CONFIG.TYPE_ID.NEWS);
         } else if (data.urls && Array.isArray(data.urls)) {
-
-          return data.urls.filter((item: any) => item.isActive && item.typeId === 3);
-      } else if (data.urls && typeof data.urls === 'object' && !Array.isArray(data.urls)) {
-        return (data.urls.isActive && data.urls.typeId === 3) ? [data.urls] : [];
+          return data.urls.filter((item: any) => item.isActive && item.typeId === RADIO_CONFIG.TYPE_ID.NEWS);
+        } else if (data.urls && typeof data.urls === 'object' && !Array.isArray(data.urls)) {
+          return (data.urls.isActive && data.urls.typeId === RADIO_CONFIG.TYPE_ID.NEWS) ? [data.urls] : [];
       } else {
         return [];
       }
@@ -108,6 +118,8 @@ export interface NewsItem {
             while ((match = itemRegex.exec(xmlText)) !== null && allNews.length < 50) {
               const itemContent = match[1];
               
+              if (!itemContent) continue;
+              
               const title = this.extractTagContent(itemContent, 'title');
               const description = this.extractTagContent(itemContent, 'description');
               const link = this.extractTagContent(itemContent, 'link');
@@ -116,15 +128,15 @@ export interface NewsItem {
               
               if (title && link) {
                 allNews.push({
-                  title: this.cleanText(title),
-                  description: this.cleanText(description),
-                  link,
-                  pubDate,
-                  guid
+                  title: title || '',
+                  description: description || '',
+                  link: link || '',
+                  pubDate: pubDate || new Date().toISOString(),
+                  guid: guid || link
                 });
-              itemCount++;
+                itemCount++;
+              }
             }
-          }
         } catch (urlError) {
           // Ignora erros de URLs individuais
         }
@@ -163,24 +175,31 @@ export interface NewsItem {
       }
     }
   
-    private static extractTagContent(xml: string, tagName: string): string {
-      try {
-
-        const regex = new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, 'i');
-        const match = xml.match(regex);
-        if (match && match[1]) {
-          return this.cleanText(match[1]);
-        }
-        return '';
-      } catch (error) {
+  private static extractTagContent(xml: string, tagName: string): string {
+    try {
+      if (!xml || typeof xml !== 'string') {
         return '';
       }
-    }
-  
-    private static cleanText(text: string): string {
-      if (!text) return '';
-      
 
+      const regex = new RegExp(`<${tagName}[^>]*>([\\s\\S]*?)<\\/${tagName}>`, 'i');
+      const match = xml.match(regex);
+      
+      if (match && match[1] !== undefined && match[1] !== null) {
+        return this.cleanText(match[1]);
+      }
+      return '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  private static cleanText(text: string): string {
+    // Validação rigorosa para evitar erros com undefined/null
+    if (!text || typeof text !== 'string') {
+      return '';
+    }
+
+    try {
       return text
         .replace(/<[^>]*>/g, '') // Remove todas as tags HTML
         .replace(/&nbsp;/g, ' ') // Espaços não-quebrados
@@ -194,7 +213,11 @@ export interface NewsItem {
         .replace(/&mdash;/g, '—') // Traço em
         .replace(/\s+/g, ' ') // Múltiplos espaços em um só
         .trim();
+    } catch (error) {
+      console.error('Erro ao limpar texto:', error);
+      return '';
     }
+  }
   
     static async getNewsUrlsByType(typeId: number): Promise<NewsUrl[]> {
       try {

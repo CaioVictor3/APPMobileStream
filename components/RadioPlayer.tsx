@@ -1,16 +1,15 @@
-import { RADIO_CONFIG } from '@/constants/radioConfig';
 import RadioService from '@/services/radioService';
 import { Ionicons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 interface RadioPlayerProps {
@@ -21,8 +20,8 @@ interface RadioPlayerProps {
 }
 
 export default function RadioPlayer({ 
-  stationName = "Radio Central 91.9", 
-  stationDescription = RADIO_CONFIG.STATION_DESCRIPTION.replace("Radio Central 91.9 (", "").replace(")", ""),
+  stationName = "Rádio Online", 
+  stationDescription = "Transmissão ao vivo",
   autoPlay = false,
   streamUrl
 }: RadioPlayerProps) {
@@ -31,6 +30,9 @@ export default function RadioPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentStreamUrl, setCurrentStreamUrl] = useState<string | null>(null);
+  
+  // Ref para controlar se o autoPlay já foi executado
+  const hasAutoPlayed = React.useRef(false);
 
   useEffect(() => {
     // Configurar modo de áudio para reprodução de streaming
@@ -50,12 +52,14 @@ export default function RadioPlayer({
     };
   }, [sound]);
 
-  // Auto-play quando autoPlay prop for true
+  // Auto-play quando autoPlay prop for true (apenas uma vez)
   useEffect(() => {
-    if (autoPlay && !sound && !isLoading) {
+    if (autoPlay && !hasAutoPlayed.current) {
+      hasAutoPlayed.current = true;
       loadStream(true);
     }
-  }, [autoPlay]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadStream = async (shouldPlay = false) => {
     try {
@@ -97,18 +101,14 @@ export default function RadioPlayer({
     }
   };
 
-  const playPause = async () => {
+  const play = async () => {
     if (!sound) {
-      await loadStream();
+      await loadStream(true);
       return;
     }
 
     try {
-      if (isPlaying) {
-        await sound.pauseAsync();
-      } else {
-        await sound.playAsync();
-      }
+      await sound.playAsync();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro ao reproduzir áudio';
       setError(errorMessage);
@@ -119,15 +119,11 @@ export default function RadioPlayer({
   const stop = async () => {
     if (sound) {
       try {
-
         await sound.unloadAsync();
-  
-
         setSound(null);
         setIsPlaying(false);
         setCurrentStreamUrl(null);
       } catch (err) {
-
         console.error('Erro ao descarregar o áudio:', err);
       }
     }
@@ -146,28 +142,43 @@ export default function RadioPlayer({
 
         <View style={styles.controlsContainer}>
           {isLoading ? (
-            <ActivityIndicator size="large" color="#007AFF" />
+            <ActivityIndicator size="large" color="#0097A7" />
           ) : (
-            <TouchableOpacity
-              style={[styles.controlButton, styles.playButton]}
-              onPress={playPause}
-              disabled={isLoading}
-            >
-              <Ionicons
-                name={isPlaying ? 'pause' : 'play'}
-                size={32}
-                color="white"
-              />
-            </TouchableOpacity>
-          )}
+            <>
+              {/* Botão Play */}
+              <TouchableOpacity
+                style={[
+                  styles.controlButton, 
+                  styles.playButton,
+                  isPlaying && styles.disabledButton
+                ]}
+                onPress={play}
+                disabled={isLoading || isPlaying}
+              >
+                <Ionicons
+                  name="play"
+                  size={32}
+                  color="white"
+                />
+              </TouchableOpacity>
 
-          {sound && (
-            <TouchableOpacity
-              style={[styles.controlButton, styles.stopButton]}
-              onPress={stop}
-            >
-              <Ionicons name="stop" size={24} color="white" />
-            </TouchableOpacity>
+              {/* Botão Stop */}
+              <TouchableOpacity
+                style={[
+                  styles.controlButton, 
+                  styles.stopButton,
+                  !sound && styles.disabledButton
+                ]}
+                onPress={stop}
+                disabled={!sound}
+              >
+                <Ionicons 
+                  name="stop" 
+                  size={28} 
+                  color="white" 
+                />
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
@@ -176,22 +187,11 @@ export default function RadioPlayer({
             {isLoading 
               ? 'Carregando stream...' 
               : isPlaying 
-                ? 'Reproduzindo' 
-                : streamUrl 
-                  ? 'Pausado' 
-                  : 'Pronto para carregar'
+                ? '🔊 Reproduzindo ao vivo' 
+                : '⏸️ Pronto para reproduzir'
             }
           </Text>
         </View>
-
-        {!streamUrl && !isLoading && (
-          <TouchableOpacity
-            style={styles.loadButton}
-            onPress={() => loadStream()}
-          >
-            <Text style={styles.loadButtonText}>Carregar Stream</Text>
-          </TouchableOpacity>
-        )}
       </View>
     </SafeAreaView>
   );
@@ -200,65 +200,65 @@ export default function RadioPlayer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'transparent',
   },
   playerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 16,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 6,
     textAlign: 'center',
   },
   description: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 30,
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 24,
     textAlign: 'center',
   },
   controlsContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 20,
+    gap: 20,
   },
   controlButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   playButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#10b981',
   },
   stopButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: '#ef4444',
+  },
+  disabledButton: {
+    backgroundColor: '#9ca3af',
+    opacity: 0.5,
   },
   statusContainer: {
     marginBottom: 20,
-    minHeight: 20,
+    minHeight: 24,
   },
   statusText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 15,
+    color: '#64748b',
     textAlign: 'center',
-  },
-  loadButton: {
-    backgroundColor: '#34C759',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  loadButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   errorContainer: {
     backgroundColor: '#FFEBEE',

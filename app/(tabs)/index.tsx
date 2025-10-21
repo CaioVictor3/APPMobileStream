@@ -12,15 +12,18 @@ import {
     View
 } from 'react-native';
 
+import ApiConfigError from '@/components/ApiConfigError';
 import NewsCard from '@/components/NewsCard';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { validateApiConfig } from '@/constants/radioConfig';
 import { NewsItem, NewsService } from '@/services/newsService';
 
 export default function HomeScreen() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const loadNews = async () => {
     try {
@@ -56,9 +59,24 @@ export default function HomeScreen() {
     router.push('/(tabs)/radio');
   };
 
+  // Valida configuração e carrega notícias ao montar o componente
   useEffect(() => {
+    const validation = validateApiConfig();
+    if (!validation.isValid) {
+      setConfigError(validation.error || 'Erro de configuração');
+      setLoading(false);
+      return;
+    }
+    
+    // Só carrega notícias se a configuração estiver válida
     loadNews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Exibe erro de configuração se houver
+  if (configError) {
+    return <ApiConfigError errorMessage={configError} />;
+  }
 
   if (loading) {
     return (

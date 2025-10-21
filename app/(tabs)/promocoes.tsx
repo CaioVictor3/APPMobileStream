@@ -1,5 +1,7 @@
+import ApiConfigError from '@/components/ApiConfigError';
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { validateApiConfig } from '@/constants/radioConfig';
 import { PromotionItem, promocoesRadioService } from "@/services/promocoesRadioService";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
@@ -29,6 +31,7 @@ export default function PromocoesScreen() {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   const loadAds = async () => {
     try {
@@ -54,8 +57,18 @@ export default function PromocoesScreen() {
     }
   };
 
+  // Valida configuração e carrega promoções ao montar o componente
   useEffect(() => {
+    const validation = validateApiConfig();
+    if (!validation.isValid) {
+      setConfigError(validation.error || 'Erro de configuração');
+      setLoading(false);
+      return;
+    }
+    
+    // Só carrega promoções se a configuração estiver válida
     loadAds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -162,6 +175,11 @@ export default function PromocoesScreen() {
 
     return pages;
   };
+
+  // Exibe erro de configuração se houver
+  if (configError) {
+    return <ApiConfigError errorMessage={configError} />;
+  }
 
   if (loading) {
     return (

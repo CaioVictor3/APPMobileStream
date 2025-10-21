@@ -1,3 +1,4 @@
+import { RADIO_CONFIG, validateApiConfig } from '@/constants/radioConfig';
 import axios from "axios";
 
 export interface PromotionItem {
@@ -19,8 +20,8 @@ export interface PromotionItem {
   lastRaffle?: string;
 }
 
-const API_URL = "https://audieappapi.playlistsolutions.com/api/v1/Promotion";
-const API_KEY = "AU-ecOv8l6DtKaRqZSQC4cfm1AD5hePO";
+const API_URL = `${RADIO_CONFIG.API_BASE_URL}${RADIO_CONFIG.PROMOTIONS_ENDPOINT}`;
+const API_KEY = RADIO_CONFIG.API_KEY;
 
 interface RawPromotion {
   id?: number;
@@ -68,9 +69,18 @@ const retryWithBackoff = async <T>(
 };
 
 export const promocoesRadioService = {
-
+  /**
+   * Carrega apenas as PROMOÇÕES ATIVAS da API
+   * Filtra por: isActive === true
+   */
   async getAllAds(): Promise<PromotionItem[]> {
     try {
+      // Valida configuração da API
+      const validation = validateApiConfig();
+      if (!validation.isValid) {
+        throw new Error(validation.error);
+      }
+
       return await retryWithBackoff(async () => {
         const allPromotions: PromotionItem[] = [];
         let currentPage = 1;
@@ -168,15 +178,18 @@ export const promocoesRadioService = {
   },
 
   filterPromotions(promotions: PromotionItem[], searchTerm: string): PromotionItem[] {
-    if (!searchTerm.trim()) {
+    if (!searchTerm || !searchTerm.trim()) {
       return promotions;
     }
 
     const term = searchTerm.toLowerCase();
-    return promotions.filter(item => 
-      item.title.toLowerCase().indexOf(term) > -1 ||
-      item.description.toLowerCase().indexOf(term) > -1
-    );
+    return promotions.filter(item => {
+      // Validação segura para evitar erros com undefined/null
+      const title = item.title?.toLowerCase() || '';
+      const description = item.description?.toLowerCase() || '';
+      
+      return title.indexOf(term) > -1 || description.indexOf(term) > -1;
+    });
   },
 
   paginatePromotions(promotions: PromotionItem[], currentPage: number, entriesPerPage: number): PromotionItem[] {

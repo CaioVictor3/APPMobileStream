@@ -1,6 +1,8 @@
+import ApiConfigError from '@/components/ApiConfigError';
 import RadioPlayer from '@/components/RadioPlayer';
 import StreamSelector from '@/components/StreamSelector';
 import { ThemedText } from '@/components/themed-text';
+import { validateApiConfig } from '@/constants/radioConfig';
 import RadioService, { RadioUrl } from '@/services/radioService';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
@@ -20,15 +22,24 @@ export default function RadioScreen() {
   const [selectedStream, setSelectedStream] = useState<RadioUrl | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
+  
+  // Ref para controlar se é a primeira carga
+  const isFirstLoad = React.useRef(true);
+
+  const handleStreamSelect = (stream: RadioUrl) => {
+    setSelectedStream(stream);
+  };
 
   const loadStreams = async () => {
     try {
       const radioStreams = await RadioService.getRadioStreams();
       setStreams(radioStreams);
       
-
-      if (radioStreams.length > 0 && !selectedStream) {
+      // Seleciona a primeira estação apenas na primeira carga
+      if (radioStreams.length > 0 && isFirstLoad.current) {
         setSelectedStream(radioStreams[0]);
+        isFirstLoad.current = false;
       }
     } catch (error) {
       console.error('Erro ao carregar streams:', error);
@@ -48,13 +59,24 @@ export default function RadioScreen() {
     loadStreams();
   };
 
-  const handleStreamSelect = (stream: RadioUrl) => {
-    setSelectedStream(stream);
-  };
-
+  // Valida configuração e carrega streams ao montar o componente
   useEffect(() => {
+    const validation = validateApiConfig();
+    if (!validation.isValid) {
+      setConfigError(validation.error || 'Erro de configuração');
+      setLoading(false);
+      return;
+    }
+    
+    // Só carrega streams se a configuração estiver válida
     loadStreams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Exibe erro de configuração se houver
+  if (configError) {
+    return <ApiConfigError errorMessage={configError} />;
+  }
 
   if (loading) {
     return (
