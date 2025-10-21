@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { NewsItem, noticiasRadioService } from "@/services/noticiasRadioService";
+import { PromotionItem, promocoesRadioService } from "@/services/promocoesRadioService";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -17,37 +17,50 @@ import {
   View,
 } from "react-native";
 
-export default function NoticiasRadioScreen() {
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [filteredNews, setFilteredNews] = useState<NewsItem[]>([]);
+export default function PromocoesScreen() {
+  const [ads, setAds] = useState<PromotionItem[]>([]);
+  const [filteredAds, setFilteredAds] = useState<PromotionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [selectedAd, setSelectedAd] = useState<PromotionItem | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
-  const loadNews = async () => {
+  const loadAds = async () => {
     try {
-      console.log("[NoticiasRadioScreen] Carregando todas as notícias disponíveis");
+      console.log("[PromocoesScreen] ========================================");
+      console.log("[PromocoesScreen] Iniciando carregamento de promoções");
+      console.log("[PromocoesScreen] ========================================");
       setLoading(true);
       
-      const data = await noticiasRadioService.getAllNews();
+      const data = await promocoesRadioService.getAllAds();
+      
+      console.log(`[PromocoesScreen] Resposta recebida: ${data.length} promoções`);
       
       if (data.length === 0) {
-        Alert.alert("Aviso", "Nenhuma notícia foi encontrada.");
-        return;
+        console.warn("[PromocoesScreen] ⚠️ NENHUMA promoção ativa foi retornada pela API");
+        console.warn("[PromocoesScreen] Possíveis motivos:");
+        console.warn("[PromocoesScreen] 1. Não há promoções cadastradas com isActive=true");
+        console.warn("[PromocoesScreen] 2. Erro na API ou chave de API inválida");
+        console.warn("[PromocoesScreen] 3. Problema de conexão");
+        Alert.alert(
+          "Aviso", 
+          "Nenhuma promoção ativa foi encontrada.\n\nVerifique:\n• Se há promoções cadastradas\n• Se o campo 'isActive' está marcado como true\n• Conexão com internet"
+        );
+      } else {
+        console.log(`[PromocoesScreen] ✅ ${data.length} promoções ativas carregadas com sucesso`);
+        console.log(`[PromocoesScreen] Primeira promoção: ${data[0]?.title || 'N/A'}`);
       }
 
-      console.log(`[NoticiasRadioScreen] ${data.length} notícias carregadas`);
-      setNews(data);
-      setFilteredNews(data);
-      setTotalPages(noticiasRadioService.getTotalPages(data.length, entriesPerPage));
+      setAds(data);
+      setFilteredAds(data);
+      setTotalPages(promocoesRadioService.getTotalPages(data.length, entriesPerPage));
     } catch (error) {
-      console.error("[NoticiasRadioScreen] Erro ao carregar notícias:", error);
-      Alert.alert("Erro", "Não foi possível carregar as notícias. Verifique sua conexão e tente novamente.");
+      console.error("[PromocoesScreen] ❌ Erro ao carregar promoções:", error);
+      Alert.alert("Erro", "Não foi possível carregar as promoções. Verifique sua conexão e tente novamente.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -55,38 +68,38 @@ export default function NoticiasRadioScreen() {
   };
 
   useEffect(() => {
-    loadNews();
+    loadAds();
   }, []);
 
   useEffect(() => {
 
-    const filtered = noticiasRadioService.filterNews(news, searchTerm);
-    setFilteredNews(filtered);
+    const filtered = promocoesRadioService.filterPromotions(ads, searchTerm);
+    setFilteredAds(filtered);
     setCurrentPage(1);
-    setTotalPages(noticiasRadioService.getTotalPages(filtered.length, entriesPerPage));
-  }, [searchTerm, news]);
+    setTotalPages(promocoesRadioService.getTotalPages(filtered.length, entriesPerPage));
+  }, [searchTerm, ads]);
 
   const onRefresh = () => {
     setRefreshing(true);
-    loadNews();
+    loadAds();
   };
 
-  const showNewsModal = (newsItem: NewsItem) => {
-    setSelectedNews(newsItem);
+  const showAdModal = (adItem: PromotionItem) => {
+    setSelectedAd(adItem);
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setSelectedNews(null);
+    setSelectedAd(null);
   };
 
-  const openNewsLink = async (url?: string) => {
+  const openAdLink = async (url?: string) => {
     if (url) {
       try {
         await Linking.openURL(url);
       } catch (error) {
-        Alert.alert("Erro", "Não foi possível abrir o link da notícia.");
+        Alert.alert("Erro", "Não foi possível abrir o link da publicidade.");
       }
     }
   };
@@ -105,7 +118,7 @@ export default function NoticiasRadioScreen() {
   };
 
   const getCurrentPageData = () => {
-    return noticiasRadioService.paginateNews(filteredNews, currentPage, entriesPerPage);
+    return promocoesRadioService.paginatePromotions(filteredAds, currentPage, entriesPerPage);
   };
 
   const goToPage = (page: number) => {
@@ -167,20 +180,20 @@ export default function NoticiasRadioScreen() {
     return (
       <ThemedView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0097A7" />
-        <ThemedText style={styles.loadingText}>Carregando notícias...</ThemedText>
+        <ThemedText style={styles.loadingText}>Carregando promoções...</ThemedText>
       </ThemedView>
     );
   }
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.headerTitle}>Notícias da Rádio</ThemedText>
+      <ThemedText style={styles.headerTitle}>Promoções da Rádio</ThemedText>
 
-      {/* Barra de busca (baseada no script JavaScript) */}
+      {/* Barra de busca */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Buscar notícias..."
+          placeholder="Buscar promoções..."
           value={searchTerm}
           onChangeText={setSearchTerm}
           placeholderTextColor="#9ca3af"
@@ -190,7 +203,7 @@ export default function NoticiasRadioScreen() {
       {/* Informações de paginação */}
       <View style={styles.paginationInfo}>
         <ThemedText style={styles.paginationInfoText}>
-          Página {currentPage} de {totalPages} ({filteredNews.length} notícias)
+          Página {currentPage} de {totalPages} ({filteredAds.length} promoções)
         </ThemedText>
       </View>
 
@@ -210,7 +223,7 @@ export default function NoticiasRadioScreen() {
           <TouchableOpacity
             style={styles.card}
             activeOpacity={0.9}
-            onPress={() => showNewsModal(item)}
+            onPress={() => showAdModal(item)}
           >
             <View style={styles.cardContent}>
               {item.imageUrl ? (
@@ -229,12 +242,18 @@ export default function NoticiasRadioScreen() {
                 <ThemedText style={styles.title}>{item.title}</ThemedText>
                 
                 <View style={styles.metaContainer}>
-                  <ThemedText style={styles.author}>Por: {item.author}</ThemedText>
-                  <ThemedText style={styles.category}>{item.category}</ThemedText>
+                  <ThemedText style={[styles.category, item.isActive ? styles.activeStatus : styles.inactiveStatus]}>
+                    {item.isActive ? "🟢 Ativa" : "🔴 Inativa"}
+                  </ThemedText>
+                  {item.isAd && <ThemedText style={styles.adBadge}>📢 Publicidade</ThemedText>}
                 </View>
                 
                 <ThemedText style={styles.publishedAt}>
-                  {formatDate(item.publishedAt)}
+                  Início: {formatDate(item.startDate)}
+                </ThemedText>
+                
+                <ThemedText style={styles.publishedAt}>
+                  Fim: {formatDate(item.endDate)}
                 </ThemedText>
                 
                 <ThemedText style={styles.description} numberOfLines={3}>
@@ -251,7 +270,7 @@ export default function NoticiasRadioScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <ThemedText style={styles.emptyText}>
-              {searchTerm ? "Nenhuma notícia encontrada para sua busca." : "Nenhuma notícia disponível"}
+              {searchTerm ? "Nenhuma promoção encontrada para sua busca." : "Nenhuma promoção ativa disponível"}
             </ThemedText>
           </View>
         }
@@ -264,7 +283,7 @@ export default function NoticiasRadioScreen() {
         </View>
       )}
 
-      {/* Modal de descrição (baseado no script JavaScript) */}
+      {/* Modal de descrição */}
       <Modal
         visible={modalVisible}
         animationType="slide"
@@ -273,44 +292,69 @@ export default function NoticiasRadioScreen() {
       >
         <ThemedView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <ThemedText style={styles.modalTitle}>Detalhes da Notícia</ThemedText>
+            <ThemedText style={styles.modalTitle}>Detalhes da Promoção</ThemedText>
             <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
               <ThemedText style={styles.closeButtonText}>✕</ThemedText>
             </TouchableOpacity>
           </View>
           
-          {selectedNews && (
+          {selectedAd && (
             <ScrollView style={styles.modalContent}>
-              {selectedNews.imageUrl && (
+              {selectedAd.imageUrl && (
                 <Image
-                  source={{ uri: selectedNews.imageUrl }}
+                  source={{ uri: selectedAd.imageUrl }}
                   style={styles.modalImage}
                   resizeMode="cover"
                 />
               )}
               
-              <ThemedText style={styles.modalNewsTitle}>{selectedNews.title}</ThemedText>
+              <ThemedText style={styles.modalNewsTitle}>{selectedAd.title}</ThemedText>
               
               <View style={styles.modalMetaContainer}>
-                <ThemedText style={styles.modalAuthor}>Por: {selectedNews.author}</ThemedText>
-                <ThemedText style={styles.modalCategory}>{selectedNews.category}</ThemedText>
+                <ThemedText style={[styles.modalCategory, selectedAd.isActive ? styles.activeStatus : styles.inactiveStatus]}>
+                  Status: {selectedAd.isActive ? "Ativa 🟢" : "Inativa 🔴"}
+                </ThemedText>
+                {selectedAd.isAd && <ThemedText style={styles.adBadge}>📢 Publicidade</ThemedText>}
               </View>
               
               <ThemedText style={styles.modalPublishedAt}>
-                Publicado em: {formatDate(selectedNews.publishedAt)}
+                Início: {formatDate(selectedAd.startDate)}
               </ThemedText>
+              
+              <ThemedText style={styles.modalPublishedAt}>
+                Término: {formatDate(selectedAd.endDate)}
+              </ThemedText>
+              
+              {selectedAd.dateUndefined && (
+                <ThemedText style={styles.modalPublishedAt}>
+                  ⏰ Data indefinida
+                </ThemedText>
+              )}
               
               <ThemedText style={styles.modalDescription}>
-                {selectedNews.description}
+                {selectedAd.description}
               </ThemedText>
               
-              {selectedNews.pubUri && (
+              {selectedAd.isAuto && (
+                <View style={styles.autoPromoInfo}>
+                  <ThemedText style={styles.autoPromoText}>
+                    🎲 Sorteio automático
+                  </ThemedText>
+                  {selectedAd.lastRaffle && (
+                    <ThemedText style={styles.autoPromoText}>
+                      Último sorteio: {formatDate(selectedAd.lastRaffle)}
+                    </ThemedText>
+                  )}
+                </View>
+              )}
+              
+              {selectedAd.externalUrl && (
                 <TouchableOpacity 
                   style={styles.linkButton}
-                  onPress={() => openNewsLink(selectedNews.pubUri)}
+                  onPress={() => openAdLink(selectedAd.externalUrl)}
                 >
                   <ThemedText style={styles.linkButtonText}>
-                    Ler notícia completa →
+                    Acessar link externo →
                   </ThemedText>
                 </TouchableOpacity>
               )}
@@ -425,6 +469,17 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 12,
     color: "#3b82f6",
+    fontWeight: "600",
+  },
+  activeStatus: {
+    color: "#10b981",
+  },
+  inactiveStatus: {
+    color: "#ef4444",
+  },
+  adBadge: {
+    fontSize: 12,
+    color: "#f59e0b",
     fontWeight: "600",
   },
   publishedAt: {
@@ -573,4 +628,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  autoPromoInfo: {
+    backgroundColor: "#f3f4f6",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  autoPromoText: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginBottom: 4,
+  },
 });
+
