@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { PromotionItem, promocoesRadioService } from "@/services/promocoesRadioService";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,6 +10,7 @@ import {
   Image,
   Linking,
   Modal,
+  Platform,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -172,7 +174,20 @@ export default function PromocoesScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.headerTitle}>Promoções da Rádio</ThemedText>
+      {/* Header com fundo colorido */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerLeft}>
+            <Ionicons name="megaphone-outline" size={28} color="white" />
+            <View>
+              <ThemedText style={styles.headerTitle}>Promoções da Rádio</ThemedText>
+              <ThemedText style={styles.headerSubtitle}>
+                Confira nossas ofertas e campanhas
+              </ThemedText>
+            </View>
+          </View>
+        </View>
+      </View>
 
       {/* Informações de paginação */}
       <View style={styles.paginationInfo}>
@@ -344,14 +359,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8fafc",
-    paddingTop: 20,
+  },
+  header: {
+    backgroundColor: "#0097A7",
+    paddingTop: Platform.OS === 'ios' ? 60 : 50,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+    marginBottom: 12,
+  },
+  headerContent: {
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
-    textAlign: "center",
-    color: "#1f2937",
-    marginBottom: 16,
+    color: "white",
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '400',
+    lineHeight: 18,
+    marginTop: 2,
   },
   loadingContainer: {
     flex: 1,
@@ -366,16 +400,17 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   searchInput: {
     backgroundColor: "white",
     borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 15,
     borderWidth: 1,
     borderColor: "#e5e7eb",
+    color: "#111827",
   },
   paginationInfo: {
     paddingHorizontal: 16,
@@ -392,9 +427,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: "hidden",
-    marginBottom: 16,
+    marginBottom: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -405,12 +440,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   image: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 130,
   },
   placeholder: {
-    width: 120,
-    height: 120,
+    width: 100,
+    height: 130,
     backgroundColor: "#e5e7eb",
     justifyContent: "center",
     alignItems: "center",
@@ -421,18 +456,21 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     flex: 1,
-    padding: 12,
+    padding: 10,
+    justifyContent: "space-between",
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
     color: "#111827",
-    marginBottom: 8,
-    lineHeight: 20,
+    marginBottom: 6,
+    lineHeight: 18,
+    flexShrink: 1,
   },
   metaContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 6,
     marginBottom: 4,
   },
   author: {
@@ -457,16 +495,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   publishedAt: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#6b7280",
-    marginBottom: 8,
+    marginBottom: 4,
     fontStyle: "italic",
   },
   description: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#374151",
-    lineHeight: 18,
-    marginBottom: 8,
+    lineHeight: 17,
+    marginBottom: 6,
+    flexShrink: 1,
   },
   viewButton: {
     alignSelf: "flex-end",
@@ -480,6 +519,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 40,
   },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#f1f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
   emptyText: {
     fontSize: 16,
     color: "#6b7280",
@@ -489,18 +537,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     flexWrap: "wrap",
+    gap: 6,
   },
   paginationButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginHorizontal: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginHorizontal: 2,
     borderRadius: 8,
     backgroundColor: "#f3f4f6",
-    minWidth: 40,
+    minWidth: 36,
     alignItems: "center",
+    justifyContent: "center",
   },
   paginationButtonActive: {
     backgroundColor: "#0097A7",
@@ -527,8 +577,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 60 : 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
     backgroundColor: "white",
@@ -537,30 +588,38 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: "#1f2937",
+    flex: 1,
+    marginRight: 8,
   },
   closeButton: {
     padding: 8,
+    minWidth: 40,
+    alignItems: "center",
   },
   closeButtonText: {
-    fontSize: 20,
+    fontSize: 24,
     color: "#6b7280",
+    fontWeight: "bold",
   },
   modalContent: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   modalImage: {
     width: "100%",
-    height: 200,
+    height: 220,
     borderRadius: 12,
-    marginVertical: 16,
+    marginTop: 16,
+    marginBottom: 12,
   },
   modalNewsTitle: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "700",
     color: "#111827",
     marginBottom: 12,
-    lineHeight: 26,
+    lineHeight: 25,
+    paddingRight: 8,
   },
   modalMetaContainer: {
     flexDirection: "row",
@@ -584,18 +643,20 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   modalDescription: {
-    fontSize: 16,
+    fontSize: 15,
     color: "#374151",
-    lineHeight: 24,
-    marginBottom: 20,
+    lineHeight: 22,
+    marginBottom: 16,
+    paddingRight: 8,
   },
   linkButton: {
     backgroundColor: "#0097A7",
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: "center",
-    marginTop: 16,
+    marginTop: 12,
+    marginBottom: 16,
   },
   linkButtonText: {
     color: "white",

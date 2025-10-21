@@ -81,27 +81,27 @@ export default function StreamSelector({ streams, selectedStream, onStreamSelect
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 16,
-    paddingHorizontal: 4,
+    gap: 10,
+    marginBottom: 12,
+    paddingHorizontal: 2,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: '700',
     color: '#1f2937',
   },
   streamsList: {
-    gap: 12,
+    gap: 10,
   },
   streamItem: {
     backgroundColor: 'white',
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 12,
+    padding: 14,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -118,30 +118,32 @@ const styles = StyleSheet.create({
   streamContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 12,
   },
   streamIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
   },
   streamInfo: {
     flex: 1,
+    marginRight: 8,
   },
   streamName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#1f2937',
-    marginBottom: 4,
+    marginBottom: 3,
+    flexShrink: 1,
   },
   streamType: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#64748b',
     fontWeight: '500',
   },
   selectedIndicator: {
-    marginLeft: 8,
+    marginLeft: 4,
   },
 });
